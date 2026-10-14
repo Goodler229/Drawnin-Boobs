@@ -1,0 +1,171 @@
+<!DOCTYPE html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Нейромапа</title>
+<style>
+:root{--bg:#fafaf9;--pn:#fff;--bd:#e5e5e0;--tx:#1c1c1a;--mut:#77756e;--ac:#6d5dfc;--ac2:#e9e6ff;--nd:#6d5dfc;--dg:#0ea5a4;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161618;--pn:#1f1f23;--bd:#303036;--tx:#ececea;--mut:#9a98a0;--ac:#9a8cff;--ac2:#2b2850;--nd:#9a8cff;--dg:#3ec9c7;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161618;--pn:#1f1f23;--bd:#303036;--tx:#ececea;--mut:#9a98a0;--ac:#9a8cff;--ac2:#2b2850;--nd:#9a8cff;--dg:#3ec9c7;color-scheme:dark}
+html,body{height:100%;margin:0}body{background:var(--bg);color:var(--tx);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{display:flex;height:100%;position:relative;overflow:hidden}
+#side{width:250px;background:var(--pn);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;z-index:5}
+.logo{padding:14px 14px 8px;font-weight:700;font-size:16px;color:var(--ac)}
+#q{margin:4px 10px;padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+.btns{display:flex;gap:6px;padding:6px 10px}.btns button{flex:1}
+#list{flex:1;overflow:auto;padding:4px 0}
+.row{padding:6px 10px;cursor:pointer;display:flex;gap:8px;border-radius:6px;margin:1px 6px}.row:hover{background:var(--bg)}.row.on{background:var(--ac2)}.row i{color:var(--nd);font-style:normal}.row.dg i{color:var(--dg)}.row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+button{font:inherit;background:var(--pn);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:5px 10px;cursor:pointer}button:hover{border-color:var(--ac)}button.act{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
+#main{flex:1;display:flex;flex-direction:column;min-width:0}
+.bar{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--bd);background:var(--pn)}.sp{flex:1}#ttl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#mb{display:none}
+#view{flex:1;position:relative;overflow:hidden;min-height:0}
+.note{display:flex;height:100%}.ed{flex:1;display:flex;flex-direction:column;padding:20px;min-width:0}
+#nt{font-size:26px;font-weight:650;border:0;background:transparent;color:var(--tx);outline:0;padding:0 0 10px;font-family:inherit}
+#nb{flex:1;resize:none;border:0;background:transparent;color:var(--tx);font:14px/1.6 ui-monospace,Menlo,monospace;outline:0}
+.pv{flex:1;overflow:auto;padding:20px;border-left:1px solid var(--bd);background:var(--pn)}.pv h1,.pv h2,.pv h3{margin:.5em 0 .3em}.pv p{margin:.4em 0}.pv h4{margin:24px 0 6px;color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.05em}.mut{color:var(--mut)}
+.lk{color:var(--ac);background:var(--ac2);padding:0 5px;border-radius:5px;cursor:pointer}.lk.new{opacity:.65;border:1px dashed var(--ac)}
+.empty{padding:40px;color:var(--mut)}
+#gc{display:block;width:100%;height:100%;touch-action:none}.hint{position:absolute;left:14px;bottom:12px;color:var(--mut);font-size:12px;pointer-events:none}
+.dview{display:flex;flex-direction:column;height:100%}.dtool{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--pn);align-items:center}
+.ti{border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;padding:5px 8px;font:inherit;width:140px}.sep{width:1px;height:20px;background:var(--bd)}
+.swb{width:20px;height:20px;padding:0;border-radius:50%;margin-left:3px}
+#cv{flex:1;min-height:0;width:100%;touch-action:none;display:block}
+.sp2{stroke:#64748b;stroke-width:1.5}.edge{stroke:var(--mut);stroke-width:2;fill:none}.edge.on{stroke:var(--ac);stroke-width:3.5}.hit{stroke:transparent;stroke-width:14;fill:none;cursor:pointer}.ar{fill:var(--mut)}.gd{fill:var(--bd)}.selbox{fill:none;stroke:var(--ac);stroke-dasharray:4 3;vector-effect:non-scaling-stroke}.hd{fill:var(--ac);cursor:nwse-resize}g[data-id]{cursor:move}
+#lg{position:fixed;inset:0;z-index:20;background:var(--bg);display:none;align-items:center;justify-content:center}
+.card{background:var(--pn);border:1px solid var(--bd);border-radius:14px;padding:24px;width:min(340px,90vw);display:flex;flex-direction:column;gap:10px}
+.card input{border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;padding:8px 10px;font:inherit}.card button{background:var(--ac);color:#fff;border-color:var(--ac)}#err{color:#dc2626;min-height:1.2em;font-size:13px}
+.usr{display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid var(--bd);font-size:12px;color:var(--mut)}#who{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:700px){#side{position:absolute;height:100%;transform:translateX(-100%);transition:transform .2s}#side.open{transform:none}#mb{display:block}.note{flex-direction:column}.pv{border-left:0;border-top:1px solid var(--bd)}}
+</style></head><body>
+<div id="app"><aside id="side"><div class="logo">◉ Нейромапа</div><input id="q" placeholder="Пошук…"><div class="btns"><button id="nn">+ Нотатка</button><button id="nd">+ Схема</button></div><div id="list"></div><div class="usr"><span id="who"></span><span id="sy"></span><button id="lo">Вийти</button></div></aside>
+<main id="main"><div class="bar"><button id="mb">☰</button><b id="ttl"></b><span class="sp"></span><button class="tab" data-v="edit">Редактор</button><button class="tab" data-v="graph">Граф</button><button id="del">🗑 Видалити</button></div><div id="view"></div></main></div>
+<div id="lg"><form class="card" id="lf"><div class="logo" style="padding:0">◉ Нейромапа</div><input id="sv" placeholder="Адреса сервера, напр. https://notes.company.com"><input id="em" type="email" placeholder="Email" autocomplete="username"><input id="pw" type="password" placeholder="Пароль від пошти" autocomplete="current-password"><button type="submit">Увійти</button><div id="err"></div></form></div>
+<script>
+const $=s=>document.querySelector(s),uid=()=>Math.random().toString(36).slice(2,9),sn=v=>Math.round(v/10)*10;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PAL=['#dbeafe','#dcfce7','#fef9c3','#fee2e2','#ede9fe','#f1f5f9'];
+let S,K,tmr=0,tok=null,srv='',busy=0,again=0,poll=0,view='edit',raf=0,tool='sel',sel=new Set(),gs=new Set(),spc=0,selE=null,pend=null,dg=null,armDel=0;
+const load=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const persist=()=>{if(!K)return;try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const save=(touch=true)=>{const it=touch&&cur();if(it)it.u=Date.now();persist();sched()};
+const cur=()=>S.items.find(i=>i.id==S.cur),sh=(it,id)=>it.shapes.find(s=>s.id==id);
+const find=t=>S.items.find(i=>i.title.toLowerCase()==String(t).trim().toLowerCase());
+const links=b=>[...(b||'').matchAll(/\[\[([^\]]+)\]\]/g)].map(m=>m[1].trim());
+function mk(type,title){const i={id:uid(),type,title,body:'',shapes:[],edges:[],u:Date.now()};S.items.push(i);save(false);return i}
+function go(id){S.cur=id;view='edit';sel=new Set();selE=pend=null;tool='sel';render()}
+function seed(){const n=(id,t,b)=>({id,type:'note',title:t,body:b,shapes:[],edges:[]});
+const s=(id,k,x,y,w,h,c,t)=>({id,k,x,y,w,h,c,t}),e=(a,b)=>({id:a+b,a,b});
+return{cur:'n1',items:[n('n1','Ласкаво просимо','# Ласкаво просимо\nЦе ваша **мережа знань**. Зв’язуйте нотатки через подвійні дужки: [[Ідеї]], [[CI-схема]].\n- Вкладка «Граф» показує всі зв’язки\n- Схеми малюються як у draw.io'),
+n('n2','Ідеї','## Ідеї\nПовернутись до [[Ласкаво просимо]].\nПроцес збірки описано у [[CI-схема]].'),
+{id:'d1',type:'diagram',title:'CI-схема',body:'',shapes:[s('a','e',40,140,110,60,PAL[0],'Users'),s('b','r',230,140,140,60,PAL[1],'Jenkins Server'),s('c','r',230,30,140,50,PAL[5],'Source control'),s('d','r',460,80,120,50,PAL[2],'Build VM 1'),s('e','r',460,200,120,50,PAL[2],'Build VM 2'),s('f','d',225,260,150,80,PAL[4],'Key Vault')],edges:[e('a','b'),e('c','b'),e('b','d'),e('b','e'),e('b','f')]}]}}
+function md(t){return esc(t).split('\n').map(l=>{l=l.replace(/\[\[([^\]]+)\]\]/g,(m,x)=>`<a class="lk${find(x)?'':' new'}" data-t="${x}">${x}</a>`).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');let m;
+if(m=l.match(/^(#{1,3}) (.*)/))return`<h${m[1].length}>${m[2]}</h${m[1].length}>`;if(m=l.match(/^[-*] (.*)/))return`<div>• ${m[1]}</div>`;return l?`<p>${l}</p>`:''}).join('')}
+function list(){const q=$('#q').value.toLowerCase(),L=$('#list');L.innerHTML='';
+S.items.filter(i=>!q||i.title.toLowerCase().includes(q)||(i.body||'').toLowerCase().includes(q)).forEach(i=>{const d=document.createElement('div');d.className='row'+(i.type=='diagram'?' dg':'')+(i.id==S.cur&&view!='graph'?' on':'');d.innerHTML='<i>'+(i.type=='diagram'?'◆':'●')+'</i><span></span>';d.lastChild.textContent=i.title;d.onclick=()=>go(i.id);L.appendChild(d)})}
+function render(){cancelAnimationFrame(raf);$('#side').classList.remove('open');document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('act',b.dataset.v==view));list();const it=cur();$('#ttl').textContent=view=='graph'?'Граф знань':it?it.title:'';
+if(view=='graph')return graph();if(!it){$('#view').innerHTML='<p class="empty">Створіть нотатку або схему ліворуч</p>';return}it.type=='note'?note(it):diagram(it)}
+function note(it){$('#view').innerHTML='<div class="note"><div class="ed"><input id="nt" placeholder="Заголовок"><textarea id="nb" placeholder="Пишіть тут… [[посилання]] зв’язують нотатки"></textarea></div><div class="pv"><div id="rd"></div><h4>Зворотні посилання</h4><div id="bl"></div></div></div>';
+const nt=$('#nt'),nb=$('#nb');nt.value=it.title;nb.value=it.body;
+const pv=()=>{$('#rd').innerHTML=md(nb.value);const b=S.items.filter(o=>o.id!=it.id&&o.type=='note'&&links(o.body).some(t=>t.toLowerCase()==it.title.toLowerCase())),bl=$('#bl');bl.innerHTML=b.length?'':'<span class="mut">Поки немає</span>';b.forEach(o=>{const a=document.createElement('a');a.className='lk';a.textContent=o.title;a.onclick=()=>go(o.id);bl.appendChild(a);bl.append(' ')})};
+nt.oninput=()=>{it.title=nt.value||'Без назви';$('#ttl').textContent=it.title;save();list();pv()};nb.oninput=()=>{it.body=nb.value;save();pv()};
+$('#rd').onclick=e=>{const a=e.target.closest('.lk');if(a){const t=a.dataset.t;go((find(t)||mk('note',t)).id)}};pv()}
+function ep(s,tx,ty){const cx=s.x+s.w/2,cy=s.y+s.h/2,dx=tx-cx,dy=ty-cy,a=Math.abs(dx)/(s.w/2),b=Math.abs(dy)/(s.h/2);let t=s.k=='e'?1/Math.hypot(a,b):s.k=='d'?1/(a+b):1/Math.max(a,b);if(!isFinite(t))t=0;return[cx+dx*t,cy+dy*t]}
+function delSel(){const it=cur();if(sel.size){it.shapes=it.shapes.filter(s=>!sel.has(s.id));it.edges=it.edges.filter(e=>!sel.has(e.a)&&!sel.has(e.b));sel=new Set()}else if(selE){it.edges=it.edges.filter(e=>e.id!=selE);selE=null}save();draw()}
+const cams={};let cam={x:0,y:0,z:1},mq=null;
+function draw(){const it=cur(),sv=$('#cv');if(!sv||!it)return;const one=sel.size==1?[...sel][0]:null;
+let h=`<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" class="ar"/></marker><pattern id="gr" width="${20*cam.z}" height="${20*cam.z}" patternUnits="userSpaceOnUse" x="${cam.x}" y="${cam.y}"><circle cx="1" cy="1" r="1" class="gd"/></pattern></defs><rect width="100%" height="100%" fill="url(#gr)"/><g transform="translate(${cam.x} ${cam.y}) scale(${cam.z})">`;
+it.edges.forEach(e=>{const a=sh(it,e.a),b=sh(it,e.b);if(!a||!b)return;const p=ep(a,b.x+b.w/2,b.y+b.h/2),q=ep(b,a.x+a.w/2,a.y+a.h/2),d=`M${p[0]} ${p[1]}L${q[0]} ${q[1]}`;h+=`<path d="${d}" class="edge${selE==e.id?' on':''}" marker-end="url(#ah)"/><path data-e="${e.id}" d="${d}" class="hit"/>`});
+it.shapes.forEach(s=>{const cx=s.x+s.w/2,cy=s.y+s.h/2;let g=`<g data-id="${s.id}">`;
+if(s.k=='e')g+=`<ellipse cx="${cx}" cy="${cy}" rx="${s.w/2}" ry="${s.h/2}" fill="${s.c}" class="sp2"/>`;else if(s.k=='d')g+=`<polygon points="${cx},${s.y} ${s.x+s.w},${cy} ${cx},${s.y+s.h} ${s.x},${cy}" fill="${s.c}" class="sp2"/>`;else g+=`<rect x="${s.x}" y="${s.y}" width="${s.w}" height="${s.h}" rx="${s.k=='t'?2:8}" fill="${s.k=='t'?'transparent':s.c}" class="${s.k=='t'?'':'sp2'}"/>`;
+g+=`<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" font-size="14" fill="${s.k=='t'?'var(--tx)':'#1c1c1a'}" style="pointer-events:none">${esc(s.t||'')}</text></g>`;
+if(sel.has(s.id)||pend==s.id)g+=`<rect class="selbox" x="${s.x-4}" y="${s.y-4}" width="${s.w+8}" height="${s.h+8}"/>`+(one==s.id?`<circle class="hd" data-h="${s.id}" cx="${s.x+s.w+4}" cy="${s.y+s.h+4}" r="6"/>`:'');h+=g});
+if(mq)h+=`<rect class="selbox" style="fill:var(--ac);fill-opacity:.08" x="${Math.min(mq.x0,mq.x1)}" y="${Math.min(mq.y0,mq.y1)}" width="${Math.abs(mq.x1-mq.x0)}" height="${Math.abs(mq.y1-mq.y0)}"/>`;
+sv.innerHTML=h+'</g>';document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('act',b.dataset.tool==tool));
+const zr=$('#zr');if(zr)zr.textContent=Math.round(cam.z*100)+'%';
+const s=sh(it,one),ti=$('#st');ti.disabled=!s;const tx=s?s.t||'':'';if(ti.value!==tx)ti.value=tx;
+const dx=$('#dx');if(dx)dx.textContent=sel.size>1?'✕ Видалити ('+sel.size+')':'✕ Видалити виділене'}
+function diagram(it){const v=$('#view');cam=cams[it.id]||(cams[it.id]={x:0,y:0,z:1});mq=null;
+v.innerHTML='<div class="dview"><div class="dtool"><input id="dt" class="ti" placeholder="Назва схеми"><span class="sep"></span>'+[['sel','↖ Вибір'],['hand','✋ Рух'],['r','▭ Блок'],['e','◯'],['d','◇'],['t','T'],['arr','→ Стрілка']].map(([k,l])=>`<button data-tool="${k}">${l}</button>`).join('')+'<span class="sep"></span><input id="st" class="ti" placeholder="Текст фігури"><span>'+PAL.map(c=>`<button class="swb" data-c="${c}" style="background:${c}"></button>`).join('')+'</span><button id="dx">✕ Видалити виділене</button><span class="sep"></span><button id="zo">−</button><button id="zr">100%</button><button id="zi">+</button></div><svg id="cv"></svg></div>';
+$('#dt').value=it.title;$('#dt').oninput=e=>{it.title=e.target.value||'Без назви';$('#ttl').textContent=it.title;save();list()};
+v.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{tool=b.dataset.tool;pend=null;draw()});
+v.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{let ch=0;sel.forEach(i=>{const s=sh(it,i);if(s){s.c=b.dataset.c;ch=1}});if(ch){save();draw()}});
+$('#st').oninput=e=>{const s=sh(it,sel.size==1?[...sel][0]:null);if(s){s.t=e.target.value;save();draw()}};$('#dx').onclick=delSel;
+const sv=$('#cv'),R=()=>sv.getBoundingClientRect(),S0=e=>{const r=R();return[e.clientX-r.left,e.clientY-r.top]},P=e=>{const[a,b]=S0(e);return[(a-cam.x)/cam.z,(b-cam.y)/cam.z]},D={r:[130,60],e:[120,70],d:[130,80],t:[120,30]};
+const zoomAt=(sx,sy,f)=>{const nz=Math.min(3,Math.max(.2,cam.z*f));cam.x=sx-(sx-cam.x)*nz/cam.z;cam.y=sy-(sy-cam.y)*nz/cam.z;cam.z=nz;draw()};
+$('#zi').onclick=()=>{const r=R();zoomAt(r.width/2,r.height/2,1.25)};$('#zo').onclick=()=>{const r=R();zoomAt(r.width/2,r.height/2,.8)};$('#zr').onclick=()=>{cam.x=0;cam.y=0;cam.z=1;draw()};
+sv.onwheel=e=>{e.preventDefault();const[sx,sy]=S0(e);if(e.ctrlKey||e.metaKey)zoomAt(sx,sy,Math.exp(-Math.max(-60,Math.min(60,e.deltaY))*.008));else{cam.x-=e.shiftKey&&!e.deltaX?e.deltaY:e.deltaX;if(!(e.shiftKey&&!e.deltaX))cam.y-=e.deltaY;draw()}};
+sv.oncontextmenu=e=>e.preventDefault();
+sv.onpointerdown=e=>{if(e.button==2)return;const[sx,sy]=S0(e),[x,y]=P(e),g=e.target.closest('[data-id]'),h=e.target.closest('[data-h]'),ed=e.target.closest('[data-e]'),add=e.ctrlKey||e.metaKey||e.shiftKey;
+if(e.button==1||spc||tool=='hand'){e.preventDefault();dg={m:'pan',sx,sy,cx:cam.x,cy:cam.y};return}
+if(D[tool]&&!g){const[w,hh]=D[tool],s={id:uid(),k:tool,x:sn(x-w/2),y:sn(y-hh/2),w,h:hh,c:PAL[tool=='t'?5:0],t:tool=='t'?'Текст':'Блок'};it.shapes.push(s);sel=new Set([s.id]);selE=null;tool='sel';save();return draw()}
+if(tool=='arr'){if(g){const id=g.dataset.id;if(!pend)pend=id;else{if(pend!=id)it.edges.push({id:uid(),a:pend,b:id});pend=null;tool='sel';save()}}return draw()}
+selE=null;
+if(h){sel=new Set([h.dataset.h]);dg={m:'rs',s:sh(it,h.dataset.h)}}
+else if(g){const id=g.dataset.id;if(add){sel.has(id)?sel.delete(id):sel.add(id);dg=null}else{if(!sel.has(id))sel=new Set([id]);dg={m:'mv',x,y,o:[...sel].map(i=>{const s=sh(it,i);return[s,s.x,s.y]})}}}
+else if(ed&&!add){sel=new Set();selE=ed.dataset.e}
+else{const base=add?new Set(sel):new Set();sel=new Set(base);mq={x0:x,y0:y,x1:x,y1:y};dg={m:'mq',base}}
+draw()};
+window.onpointermove=e=>{if(!dg||view!='edit')return;const[sx,sy]=S0(e),[x,y]=P(e);
+if(dg.m=='pan'){cam.x=dg.cx+sx-dg.sx;cam.y=dg.cy+sy-dg.sy}
+else if(dg.m=='mv'){dg.o.forEach(([s,ox,oy])=>{s.x=sn(ox+x-dg.x);s.y=sn(oy+y-dg.y)})}
+else if(dg.m=='rs'){const s=dg.s;s.w=Math.max(40,sn(x-s.x));s.h=Math.max(30,sn(y-s.y))}
+else if(dg.m=='mq'&&mq){mq.x1=x;mq.y1=y;const a=Math.min(mq.x0,x),b=Math.max(mq.x0,x),c=Math.min(mq.y0,y),d=Math.max(mq.y0,y);sel=new Set(dg.base);it.shapes.forEach(s=>{if(s.x<b&&s.x+s.w>a&&s.y<d&&s.y+s.h>c)sel.add(s.id)})}
+draw()};
+window.onpointerup=()=>{if(dg){const m=dg.m;dg=null;mq=null;if(m=='mv'||m=='rs')save();draw()}};draw()}
+const GH='Перетягуйте вузли · клік — відкрити · Ctrl+клік або рамка — виділення кількох · ● нотатка ■ схема';
+function graph(){const v=$('#view');v.innerHTML='<canvas id="gc"></canvas><div class="hint"></div>';const hn=$('.hint'),upd=()=>{hn.textContent=gs.size?'Виділено: '+gs.size+' · перетягніть будь-який виділений вузол, щоб рухати групу · Esc — зняти':GH};upd();
+const c=$('#gc'),x=c.getContext('2d'),dpr=devicePixelRatio||1,W=v.clientWidth,H=v.clientHeight;c.width=W*dpr;c.height=H*dpr;
+const N=S.items.map((i,k)=>({id:i.id,t:i.title,d:i.type=='diagram',x:W/2+Math.cos(k*2.4)*90+Math.random()*30,y:H/2+Math.sin(k*2.4)*90,vx:0,vy:0})),B={};N.forEach(n=>B[n.id]=n);
+gs=new Set([...gs].filter(i=>B[i]));
+const L=[],deg={};S.items.forEach(i=>{if(i.type=='note')links(i.body).forEach(t=>{const f=find(t);if(f&&f.id!=i.id){L.push([B[i.id],B[f.id]]);deg[i.id]=(deg[i.id]||0)+1;deg[f.id]=(deg[f.id]||0)+1}})});
+const rad=n=>7+Math.min(10,(deg[n.id]||0)*2.5),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();let drag=null,moved=0,hov=null,rb=null,gm=null,gp=[0,0];
+const hit=(px,py)=>N.find(n=>Math.hypot(n.x-px,n.y-py)<rad(n)+7);
+function frame(){for(const a of N){for(const b of N){if(a==b)continue;const dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy+.01;if(d2<90000){const d=Math.sqrt(d2),f=6000/d2;a.vx+=dx/d*f;a.vy+=dy/d*f}}a.vx+=(W/2-a.x)*.002;a.vy+=(H/2-a.y)*.002}
+for(const[a,b]of L){const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,f=(d-120)*.01;a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f}
+for(const n of N){if(n.fx)continue;n.vx*=.85;n.vy*=.85;n.x+=n.vx;n.y+=n.vy}
+x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);x.strokeStyle=css('--mut');x.globalAlpha=.45;x.lineWidth=1.5;L.forEach(([a,b])=>{x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()});x.globalAlpha=1;
+for(const n of N){const r=rad(n);x.fillStyle=css(n.d?'--dg':'--nd');x.beginPath();n.d?x.rect(n.x-r,n.y-r,2*r,2*r):x.arc(n.x,n.y,r,0,7);x.fill();if(n.id==S.cur||n==hov){x.lineWidth=3;x.strokeStyle=css('--tx');x.stroke()}
+if(gs.has(n.id)){x.lineWidth=3;x.strokeStyle=css('--ac');x.beginPath();x.arc(n.x,n.y,r+5,0,7);x.stroke()}
+x.fillStyle=css('--tx');x.font='12px system-ui,sans-serif';x.textAlign='center';x.fillText(n.t,n.x,n.y+r+15)}
+if(rb){x.save();const X=Math.min(rb.x0,rb.x1),Y=Math.min(rb.y0,rb.y1),w=Math.abs(rb.x1-rb.x0),h=Math.abs(rb.y1-rb.y0);x.fillStyle=css('--ac');x.globalAlpha=.1;x.fillRect(X,Y,w,h);x.globalAlpha=1;x.strokeStyle=css('--ac');x.lineWidth=1;x.setLineDash([4,3]);x.strokeRect(X,Y,w,h);x.restore()}
+raf=requestAnimationFrame(frame)}
+const P=e=>{const r=c.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+const stop=()=>{if(gm)gm.forEach(g=>g[0].fx=0);drag=null;gm=null;rb=null};
+c.onpointerdown=e=>{const[px,py]=P(e),n=hit(px,py),add=e.ctrlKey||e.metaKey||e.shiftKey;moved=0;gp=[px,py];
+if(n){if(add){gs.has(n.id)?gs.delete(n.id):gs.add(n.id);upd();return}
+if(!gs.has(n.id)){gs=new Set();upd()}drag=n;gm=N.filter(m=>gs.has(m.id)||m==n).map(m=>[m,m.x,m.y]);gm.forEach(g=>g[0].fx=1)}
+else{drag=null;const base=add?new Set(gs):new Set();gs=new Set(base);rb={x0:px,y0:py,x1:px,y1:py,base};upd()}};
+c.onpointermove=e=>{const[px,py]=P(e);
+if(drag){const dx=px-gp[0],dy=py-gp[1];gm.forEach(([m,ox,oy])=>{m.x=ox+dx;m.y=oy+dy;m.vx=m.vy=0});moved++}
+else if(rb){rb.x1=px;rb.y1=py;const a=Math.min(rb.x0,px),b=Math.max(rb.x0,px),cc=Math.min(rb.y0,py),d=Math.max(rb.y0,py);gs=new Set(rb.base);N.forEach(m=>{if(m.x>=a&&m.x<=b&&m.y>=cc&&m.y<=d)gs.add(m.id)});upd()}
+else{hov=hit(px,py)||null;c.style.cursor=hov?'pointer':'default'}};
+c.onpointerup=()=>{const d=drag,mv=moved;stop();if(d&&mv<4)go(d.id)};c.onpointerleave=stop;frame()}
+$('#nn').onclick=()=>go(mk('note','Нова нотатка').id);$('#nd').onclick=()=>go(mk('diagram','Нова схема').id);
+$('#q').oninput=list;$('#mb').onclick=()=>$('#side').classList.toggle('open');
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
+$('#del').onclick=function(){if(view=='graph'||!cur())return;if(!armDel){armDel=1;this.textContent='Точно видалити?';setTimeout(()=>{armDel=0;this.textContent='🗑 Видалити'},3000);return}armDel=0;this.textContent='🗑 Видалити';S.del=S.del||{};S.del[S.cur]=Date.now();S.items=S.items.filter(i=>i.id!=S.cur);S.cur=S.items[0]&&S.items[0].id;save(false);render()};
+window.onkeydown=e=>{const inp=/INPUT|TEXTAREA/.test(e.target.tagName),it=cur();if(inp)return;
+if(e.key==' '&&view=='edit'){spc=1;e.preventDefault()}
+if(e.key=='Escape'){if(view=='graph'){gs=new Set();const h=$('.hint');if(h)h.textContent=GH}else{sel=new Set();selE=null;pend=null;draw()}}
+if(view=='edit'&&it&&it.type=='diagram'){if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();delSel()}
+if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()=='a'){e.preventDefault();sel=new Set(it.shapes.map(s=>s.id));draw()}}};
+window.onkeyup=e=>{if(e.key==' ')spc=0};
+window.onresize=()=>{if(view=='graph')render()};
+/* ---- синхронізація та вхід ---- */
+const isFile=location.protocol=='file:',fixedSrv=isFile?(new URLSearchParams(location.search).get('server')||''):'',sig=d=>JSON.stringify([(d.items||[]).map(i=>i.id+':'+(i.u||0)).sort(),Object.entries(d.del||{}).sort()]);
+const st=t=>{const e=$('#sy');if(e)e.textContent=t},sched=()=>{clearTimeout(tmr);tmr=setTimeout(sync,1500)};
+const api=async(p,o={})=>{const r=await fetch(srv+'/api'+p,{...o,headers:{'Content-Type':'application/json',...(tok?{Authorization:'Bearer '+tok}:{})}});if(r.status==401&&p!='/login'){logout();throw 0}return r};
+function merge(R){const D={...(S.del||{})};for(const k in R.del||{})D[k]=Math.max(D[k]||0,R.del[k]);const m=new Map(S.items.map(i=>[i.id,i]));let ch=0;
+for(const r of R.items||[]){const l=m.get(r.id);if(!l){m.set(r.id,r);ch=1}else if((r.u||0)>(l.u||0)){Object.assign(l,r);ch=1}}
+const kept=[...m.values()].filter(i=>!(D[i.id]>(i.u||0)));if(kept.length!=m.size)ch=1;S.items=kept;S.del=D;if(!cur())S.cur=S.items[0]&&S.items[0].id;return ch}
+async function sync(){if(!tok)return;if(busy){again=1;return}busy=1;st('⟳');let ch=0;
+try{for(let n=0;n<3;n++){const j=await(await api('/data')).json(),R=j.data||{};ch|=merge(R);persist();if(sig(S)==sig(R))break;
+const p=await api('/data',{method:'PUT',body:JSON.stringify({rev:j.rev,data:{items:S.items,del:S.del}})});if(p.status!=409)break}st('✓')}catch(e){st(tok?'⚠ офлайн':'')}
+busy=0;if(ch){if(view=='edit'&&(dg||/INPUT|TEXTAREA/.test(document.activeElement.tagName)))list();else render()}if(again){again=0;sync()}}
+function showLogin(m){$('#lg').style.display='flex';$('#sv').style.display=isFile&&!fixedSrv?'':'none';$('#err').textContent=m||''}
+function start(email){K='nm-v2:'+email;S=load(K);if(!S||!S.items){const o=load('nm-v1');S=o&&o.items&&o.items.length?o:seed();try{localStorage.removeItem('nm-v1')}catch(e){}}
+S.del=S.del||{};$('#lg').style.display='none';$('#who').textContent=email;view='edit';if(!cur())S.cur=S.items[0]&&S.items[0].id;render();sync();clearInterval(poll);poll=setInterval(sync,15000)}
+function logout(){tok=null;K=null;clearInterval(poll);clearTimeout(tmr);try{localStorage.removeItem('nm-auth')}catch(e){}S={items:[],cur:null,del:{}};st('');render();showLogin()}
+$('#lo').onclick=logout;
+$('#lf').onsubmit=async e=>{e.preventDefault();srv=isFile?$('#sv').value.trim().replace(/\/$/,''):'';if(isFile&&!srv){$('#err').textContent='Вкажіть адресу сервера';return}
+$('#err').textContent='Вхід…';try{const r=await api('/login',{method:'POST',body:JSON.stringify({email:$('#em').value.trim(),password:$('#pw').value})}),j=await r.json();
+if(!r.ok){$('#err').textContent=j.error||'Помилка входу';return}$('#pw').value='';tok=j.token;try{localStorage.setItem('nm-auth',JSON.stringify({tok,srv,email:j.email}));localStorage.setItem('nm-srv',srv)}catch(x){}start(j.email)}catch(x){$('#err').textContent='Сервер недоступний'}};
+function boot(){const a=load('nm-auth');S={items:[],cur:null,del:{}};$('#sv').value=fixedSrv||(a&&a.srv)||localStorage.getItem('nm-srv')||'';if(a&&a.tok){tok=a.tok;srv=fixedSrv||a.srv||'';start(a.email)}else{render();showLogin()}}
+boot();
+</script></body></html>

@@ -1,0 +1,26 @@
+{
+  "name": "neuromap",
+  "version": "1.0.0",
+  "description": "Нотатки, граф зв'язків і редактор схем",
+  "main": "main.js",
+  "author": "Your Company",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:win": "electron-builder --win --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.example.neuromap",
+    "productName": "Neuromap",
+    "files": ["main.js", "index.html", "config.json", "package.json"],
+    "mac": { "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }], "category": "public.app-category.productivity" },
+    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }] },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true }
+  }
+}
