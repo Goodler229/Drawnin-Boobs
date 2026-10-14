@@ -23,21 +23,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Show repository files
+      - name: Diagnose repository structure
         shell: pwsh
         run: |
-          Write-Host "Repository root:"
-          Get-ChildItem -Force
-          Write-Host "`nProject and solution files:"
-          Get-ChildItem -Recurse -File |
-            Where-Object {
-              $_.Extension -in @(
-                ".sln", ".slnx", ".csproj",
-                ".vbproj", ".fsproj", ".cs",
-                ".csproj", ".wapproj", "package.json"
-              )
-            } |
-            Select-Object -ExpandProperty FullName
+          Write-Host "Current directory:"
+          Get-Location
+
+          Write-Host "`nFiles in repository:"
+          Get-ChildItem -Force -Recurse |
+            Select-Object -First 200 FullName
+
+          Write-Host "`nGitHub workspace:"
+          Write-Host $env:GITHUB_WORKSPACE
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
