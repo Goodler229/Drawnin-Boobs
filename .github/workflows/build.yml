@@ -1,93 +1,27 @@
-name: Build Drawnin-Boobs
-
-on:
-  push:
-    branches:
-      - main
-      - master
-  pull_request:
-    branches:
-      - main
-      - master
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-jobs:
-  build:
-    name: Build application
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Diagnose repository structure
-        shell: pwsh
-        run: |
-          Write-Host "Current directory:"
-          Get-Location
-
-          Write-Host "`nFiles in repository:"
-          Get-ChildItem -Force -Recurse |
-            Select-Object -First 200 FullName
-
-          Write-Host "`nGitHub workspace:"
-          Write-Host $env:GITHUB_WORKSPACE
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
-
-      - name: Build .NET solution or project
-        shell: pwsh
-        run: |
-          $solution = Get-ChildItem -Recurse -File -Filter "*.sln" |
-            Select-Object -First 1
-
-          if (-not $solution) {
-            $solution = Get-ChildItem -Recurse -File -Filter "*.slnx" |
-              Select-Object -First 1
-          }
-
-          if ($solution) {
-            Write-Host "Building solution: $($solution.FullName)"
-            dotnet build $solution.FullName --configuration Release
-            exit $LASTEXITCODE
-          }
-
-          $project = Get-ChildItem -Recurse -File |
-            Where-Object {
-              $_.Extension -in @(".csproj", ".vbproj", ".fsproj")
-            } |
-            Select-Object -First 1
-
-          if ($project) {
-            Write-Host "Building project: $($project.FullName)"
-            dotnet build $project.FullName --configuration Release
-            exit $LASTEXITCODE
-          }
-
-          if (Test-Path "package.json") {
-            Write-Host "Node.js project detected."
-            exit 0
-          }
-
-          throw "No .NET solution, .NET project, or root package.json was found. Check the repository structure."
-
-      - name: Setup Node.js
-        if: hashFiles('package.json') != ''
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install Node.js dependencies
-        if: hashFiles('package.json') != ''
-        run: npm ci
-
-      - name: Build Node.js application
-        if: hashFiles('package.json') != ''
-        run: npm run build --if-present
+directories:
+  output: dist
+  buildResources: build
+appId: com.example.neuromap
+productName: Neuromap
+files:
+  - filter:
+      - main.js
+      - index.html
+      - config.json
+      - package.json
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  category: public.app-category.productivity
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+electronVersion: 33.4.11
